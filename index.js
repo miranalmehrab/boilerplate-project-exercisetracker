@@ -53,8 +53,8 @@ app.get('/api/users/:_id/logs', function (req, res) {
     User.findById(req.params._id, function (err, user) {
         if (err) return console.log(err);
 
-        let from = req.query.from ? new Date(req.query.from) : new Date(0);
-        let to = req.query.to ? new Date(req.query.to) : new Date();
+        let from = req.query.from ? new Date(req.query.from).toDateString() : new Date(0).toDateString();
+        let to = req.query.to ? new Date(req.query.to).toDateString() : new Date().toDateString();
         let limit = req.query.limit ? parseInt(req.query.limit) : 0;
 
         Exercise.find({userId: user._id, date: {$gte: from, $lte: to}}, 'description duration date -_id', {limit: limit}, function (err, exercises) {

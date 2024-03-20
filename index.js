@@ -12,7 +12,7 @@ app.use(parser.urlencoded({ extended: false }));
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let User = mongoose.model('User', new mongoose.Schema({username: String}));
-let Exercise = mongoose.model('Exercise', new mongoose.Schema({userId: mongoose.ObjectId, description: String, duration: Number, date: { type: Date, default: Date.now }}));
+let Exercise = mongoose.model('Exercise', new mongoose.Schema({userId: mongoose.ObjectId, description: String, duration: Number, date: Date}));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
@@ -37,7 +37,7 @@ app.post('/api/users', function (req, res) {
 
 app.post('/api/users/:_id/exercises', function (req, res) {
     User.findById(req.params._id, function (err, user) {
-        let date = req.body.date ? new Date(req.body.date) : new Date();
+        let date = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString();
         let exercise = new Exercise({userId: user._id, description: req.body.description, duration: req.body.duration, date: date});
     
         exercise.save(function (err, exercise) {

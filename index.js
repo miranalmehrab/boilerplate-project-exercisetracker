@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 app.get('/api/users', function (req, res) {    
     User.find({}, 'username _id', function (err, data) {
         if (err) return console.error(err);
-        console.log(data);
+        // console.log(data);
         res.send(data);
     });
 });
@@ -30,7 +30,7 @@ app.post('/api/users', function (req, res) {
     let user = new User({username: req.body.username});
     user.save(function (err, data) {
         if (err) return console.error(err);
-        console.log(data);
+        // console.log(data);
         res.json({username: data.username, _id: data._id});
     });
 });
@@ -43,19 +43,22 @@ app.post('/api/users/:_id/exercises', function (req, res) {
         exercise.save(function (err, exercise) {
             if (err) return console.error(err);
             let response = {username: user.username, description: exercise.description, duration: exercise.duration, date: new Date(exercise.date).toDateString(), _id: user._id};
-            console.log(response);
+            // console.log(response);
             res.json(response);
         });
     });
 });
 
 app.get('/api/users/:_id/logs', function (req, res) {
+    console.log('/api/users/:_id/logs');
     User.findById(req.params._id, function (err, user) {
         if (err) return console.log(err);
 
-        let from = req.query.from ? new Date(req.query.from) : new Date(0);
-        let to = req.query.to ? new Date(req.query.to) : new Date();
+        let from = req.query.from ? new Date(req.query.from).toDateString() : new Date(0).toDateString();
+        let to = req.query.to ? new Date(req.query.to).toDateString() : new Date().toDateString();
         let limit = req.query.limit ? parseInt(req.query.limit) : 0;
+
+        console.log({from: from, to: to, limit: limit});
 
         Exercise.find({userId: user._id, date: {$gte: from, $lte: to}}, 'description duration date -_id', {limit: limit}, function (err, exercises) {
             if (err) return console.error(err);
@@ -66,7 +69,7 @@ app.get('/api/users/:_id/logs', function (req, res) {
             if (req.query.to) response.to = new Date(req.query.to).toDateString(); 
             response.count = logs.length;
             response.log = logs;
-            
+
             console.log(response);
             res.json(response);
         });

@@ -50,17 +50,19 @@ app.post('/api/users/:_id/exercises', function (req, res) {
 });
 
 app.get('/api/users/:_id/logs', function (req, res) {
-    console.log('/api/users/:_id/logs');
     User.findById(req.params._id, function (err, user) {
         if (err) return console.log(err);
 
         let from = req.query.from ? new Date(req.query.from).toDateString() : new Date(0).toDateString();
-        let to = req.query.to ? new Date(req.query.to).toDateString() : new Date().toDateString();
-        let limit = req.query.limit ? parseInt(req.query.limit) : 0;
+        let to = req.query.to ? new Date(req.query.to).toDateString() : null;
+        let limit = req.query.limit ? parseInt(req.query.limit) : 0;        
 
-        console.log({from: from, to: to, limit: limit});
+        let constraints = {$gte: from};
+        if (to != null) {
+            constraints.$lte = to;
+        }
 
-        Exercise.find({userId: user._id, date: {$gte: from, $lte: to}}, 'description duration date -_id', {limit: limit}, function (err, exercises) {
+        Exercise.find({userId: user._id, date: constraints}, 'description duration date -_id', {limit: limit}, function (err, exercises) {
             if (err) return console.error(err);
             
             let logs = exercises.map(exercise => ({description: exercise.description, duration: exercise.duration, date: new Date(exercise.date).toDateString()}));
@@ -69,8 +71,6 @@ app.get('/api/users/:_id/logs', function (req, res) {
             if (req.query.to) response.to = new Date(req.query.to).toDateString(); 
             response.count = logs.length;
             response.log = logs;
-
-            console.log(response);
             res.json(response);
         });
     });

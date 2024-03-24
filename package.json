@@ -3,6 +3,9 @@
 	"version": "0.1.0",
 	"description": "A REST API project, part of Free Code Camp's curriculum",
 	"main": "index.js",
+    "engines": {
+        "node": "14.x"
+    },
 	"scripts": {
 		"start": "node index.js"
 	},
